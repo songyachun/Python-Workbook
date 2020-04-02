@@ -7,6 +7,11 @@ Flasky
 <link rel="shortcut icon" href="{{ url_for('static',filename='favicon.ico') }}" type="image/x-icon">
 <link rel="icon" href="{{ url_for('static',filename='favicon.ico') }}"  type="image/x-icon">
 {% endblock head %}
+{% block scripts %}
+{{ super() }}
+{{ moment.include_moment() }}
+{# {{ moment.locale('es') }} #}
+{% endblock scripts %}
 
 {% block navbar %}
 <div class="navbar navbar-inverse" role="navigation">
