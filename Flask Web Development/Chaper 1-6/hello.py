@@ -53,9 +53,9 @@ app.config['FLASKY_ADMIN'] = 'songyachun@139.com'
 
 print(os.environ.get('MAIL_USERNAME'))
 print(os.environ.get('MAIL_PASSWORD'))
+
+
 # 异步发送邮件
-
-
 def send_async_email(app, msg):
     with app.app_context():
         mail.send(msg)
