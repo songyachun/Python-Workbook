@@ -1,0 +1,19 @@
+{
+    "sqltools.connections": [
+        {
+            "database": "mysql",
+            "dialect": "MySQL",
+            "name": "mysql",
+            "password": "123456",
+            "port": 3306,
+            "server": "localhost",
+            "username": "root"
+        },
+        {
+            "database": "${workspaceFolder}\\data.sqlite",
+            "dialect": "SQLite",
+            "name": "data"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}

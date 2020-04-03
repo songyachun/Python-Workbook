@@ -1,3 +1,6 @@
+from threading import Thread
+from flask_mail import Mail, Message
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 import os
 from wtforms.validators import DataRequired
@@ -10,6 +13,7 @@ from flask import Flask, render_template, session, redirect, url_for, flash
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
+bootstrap = Bootstrap(app)
 # print(app.config)
 app.config['SECRET_KEY'] = 'hard to guess string'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
@@ -17,7 +21,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-bootstrap = Bootstrap(app)
+
 moment = Moment(app)
 
 
@@ -26,8 +30,46 @@ def make_shell_context():
     """ 集成Python shell """
     return dict(db=db, User=User, Role=Role)
 
-from flask_migrate import Migrate
-migrate=Migrate(app,db)
+
+# 数据迁移配置
+migrate = Migrate(app, db)
+
+# 邮箱配置
+app.config['MAIL_SERVER'] = 'smtp.163.com'
+app.config['MAIL_PORT'] = 25
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+# app.config['MAIL_USERNAME']='yachun0124@163.com'
+# app.config['MAIL_PASSWORD']='syc026851'
+
+mail = Mail(app)
+
+# ------------发送邮件------------------------------------
+app.config['FLASKY_MAIL_SUBJECT_PREFIX'] = '[Flasky]'
+app.config['FLASKY_MAIL_SENDER'] = 'Flasky Admin <yachun0124@163.com>'
+# app.config['FLASKY_ADMIN'] = os.environ.get('FLASK_ADMIN')
+app.config['FLASKY_ADMIN'] = 'songyachun@139.com'
+
+print(os.environ.get('MAIL_USERNAME'))
+print(os.environ.get('MAIL_PASSWORD'))
+# 异步发送邮件
+
+
+def send_async_email(app, msg):
+    with app.app_context():
+        mail.send(msg)
+
+
+def send_mail(to, subject, template, **kwargs):
+    msg = Message(app.config['FLASKY_MAIL_SUBJECT_PREFIX']+subject,
+                  sender=app.config['FLASKY_MAIL_SENDER'], recipients=[to])
+    msg.body = render_template(template + '.txt', **kwargs)
+    msg.html = render_template(template + '.html', **kwargs)
+    thr = Thread(target=send_async_email, args=[app, msg])
+    thr.start()
+    return thr
+
 
 # ----------------------定义模型------------------------------
 
@@ -65,11 +107,16 @@ def index():
     form = NameForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.name.data).first()
+        print('看这里看这里', user)
         if user is None:
             user = User(username=form.name.data)
             db.session.add(user)
             db.session.commit()
             session['known'] = False
+            print(app.config['FLASKY_ADMIN'])
+            if app.config['FLASKY_ADMIN']:
+                send_mail(app.config['FLASKY_ADMIN'],
+                          'New User', 'mail/new_user', user=user)
         else:
             session['known'] = True
         session['name'] = form.name.data
@@ -93,5 +140,6 @@ def internal_server_error(e):
     return render_template('500.html'), 500
 
 
+# ----------------------------------------------------------------
 if __name__ == "__main__":
     app.run(debug=True)
