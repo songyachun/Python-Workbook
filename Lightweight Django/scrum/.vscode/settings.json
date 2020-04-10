@@ -1,0 +1,40 @@
+{
+    "sqltools.connections": [
+        {
+            "database": "D:\\Desktop\\Python-Workbook\\Flask Web Development\\flasky\\data-dev.sqlite",
+            "dialect": "SQLite",
+            "name": "sqlite"
+        },
+        {
+            "database": "scrum",
+            "dialect": "PostgreSQL",
+            "isActive": true,
+            "isConnected": true,
+            "name": "psql",
+            "password": "123456",
+            "port": 5432,
+            "server": "localhost",
+            "username": "postgres"
+        },
+        {
+            "database": "scrum",
+            "dialect": "PostgreSQL",
+            "isActive": true,
+            "isConnected": true,
+            "name": "psql",
+            "password": "123456",
+            "port": 5432,
+            "server": "localhost",
+            "username": "postgres"
+        },
+        {
+            "database": "mr_sql",
+            "dialect": "MySQL",
+            "name": "mysql",
+            "password": "123456",
+            "port": 3306,
+            "server": "localhost",
+            "username": "root"
+        }
+    ]
+}
